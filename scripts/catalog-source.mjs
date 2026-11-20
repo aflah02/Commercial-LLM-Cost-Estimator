@@ -1,5 +1,5 @@
 // USD / million tokens. Source URLs and verification dates travel with every route.
-import { writeFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 import { normalizeOpenRouter } from '../public/assets/engine.mjs';
 const checked = '2026-11-20';
 const urls = {
@@ -7,6 +7,9 @@ const urls = {
   google: 'https://aistudio.google.com/docs/pricing',
   anthropic: 'https://platform.claude.com/docs/en/about-claude/pricing',
   mistral: 'https://docs.mistral.ai/inference/pricing',
+  deepseek: 'https://api-docs.deepseek.com/quick_start/pricing/',
+  zai: 'https://docs.z.ai/guides/overview/pricing',
+  kimi: 'https://platform.kimi.ai/',
   openrouter: 'https://openrouter.ai/api/v1/models'
 };
 const fee = (name, rate, unit, source, note = '') => ({ name, rate, unit, source, note });
@@ -25,7 +28,12 @@ const tools = {
     search: fee('Web search', .01, 'search calls', urls.anthropic, 'Search results are billed as input tokens; web fetch has no separate fee.'),
     code: { ...fee('Code execution', .05, 'container-hours', urls.anthropic, 'At least 5 minutes per execution session. Excludes 1,550 organization-wide free hours/month. Free with the current web-search/fetch tool included.'), freeWithSearch: true }
   },
-  mistral: {}
+  mistral: {},
+  deepseek: {
+    search: fee('Model-triggered server-side search', 0, 'search calls', urls.deepseek, 'Server-side search/fetch has no separate fee from November 18, 2026; result tokens are input. Standalone Search/Fetch APIs instead cost $0.75 / 1K successful calls; use a custom fee for those.')
+  },
+  zai: { search: fee('Z.ai web search', .01, 'uses', urls.zai, 'Direct Z.ai PAYG tool pricing. Include search-result tokens in the input budget.') },
+  kimi: {}
 };
 const models = [];
 const add = (provider, apiId, name, input, output, extra = {}) => models.push({
@@ -76,6 +84,26 @@ for (const [id,name,input,output,context,efforts] of [
   ['ministral-3b-2512','Ministral 3 · 3B',.1,.1,262144,[]], ['codestral-2508','Codestral',.3,.9,131072,[]]
 ]) add('mistral',id,name,input,output,{cached:input*.1,context,maxOutput:null,efforts,
   note:'Native tool fees are not freshly verified. Use the custom-tool charge for Conversations/Agents tools; do not assume they are free. Max output limit is not verified.'});
+for (const [id,name,input,output,cached] of [
+  ['deepseek-flash','DeepSeek V4.1 Flash 1017',.30,1.20,.006],
+  ['deepseek-v4-pro','DeepSeek V4 Pro 0813',1.32,3.96,.044]
+]) add('deepseek',id,name,input,output,{cached,batch:false,context:1048576,maxOutput:393216,
+  apiBase:'https://api.deepseek.com',efforts:['none','low','medium','high','xhigh','max'],offPeak:{factor:.5},
+  note:'Direct API peak rates. Off-peak is 50%: all hours except weekdays 01–04 and 06–10 UTC, excluding Chinese public holidays. Caching is automatic. Medium/xhigh map to high; none disables thinking. No verified Batch discount.'});
+for (const [id,name,input,output,cached] of [
+  ['glm-5.3','GLM-5.3',1.40,4.40,.26], ['glm-5.3-flash','GLM-5.3 Flash',.15,.50,.03],
+  ['glm-5.3-flashx','GLM-5.3 FlashX',.37,1.25,.075], ['glm-5.3-flashx-legal','GLM-5.3 FlashX Legal',.37,1.25,.075],
+  ['glm-5.2','GLM-5.2',1.40,4.40,.26]
+]) add('zai',id,name,input,output,{cached,batch:false,context:1000000,maxOutput:128000,
+  apiBase:'https://api.z.ai/api/paas/v4/',efforts:id==='glm-5.2'?['none','low','medium','high','xhigh','max']:id.endsWith('-legal')?[]:['low','high','max'],
+  note:'International Z.ai PAYG API, separate from Coding Plan points and other regional services. Automatic cache; storage is currently a limited-time free offering. No verified Batch discount. GLM-5.3 general models always think; GLM-5.2 accepts compatibility effort aliases.'});
+for (const [id,name,input,output,cached] of [
+  ['kimi-k3.1-pro','Kimi K3.1 Pro',2,10,.20], ['kimi-k3.1-pro-highspeed','Kimi K3.1 Pro Highspeed',4,20,.20],
+  ['kimi-k3','Kimi K3',3,15,.30]
+]) add('kimi',id,name,input,output,{cached,cacheWrite:input,cacheWriteLong:id==='kimi-k3'?6:null,
+  batch:id!=='kimi-k3.1-pro-highspeed',batchFactor:.6,batchCacheWrite:false,context:1048576,maxOutput:1048576,
+  apiBase:'https://api.moonshot.ai/v1',efforts:['low','high','max'],
+  note:'International Kimi API; thinking is always on. Standard K3/K3.1 Pro Batch costs 60% of Standard. Cache writes replace the same cache-miss input portion; short TTL 5m, long 1h (only K3 long-write rate verified). Native tool fees require a custom charge.'});
 const openrouterSeeds = [
   ['openai/gpt-6.2-astra','OpenAI: GPT-6.2 Astra',1050000,128000,.000008,.00004,.0000004,.01,['low','medium','high','xhigh','max'],.00001],
   ['openai/gpt-6.2-sol','OpenAI: GPT-6.2 Sol',1050000,128000,.000002,.00001,.0000001,.01,['low','medium','high','xhigh','max'],.0000025],
@@ -95,6 +123,13 @@ for (const [id,name,context_length,max_completion_tokens,prompt,completion,input
   if (id === 'anthropic/claude-fable-5.1') pricing.input_cache_write_1h=.00002;
   if (id === 'google/gemini-4-neon') { pricing.internal_reasoning=.000015;pricing.input_cache_write=.0000000833333333333333; }
   models.push(normalizeOpenRouter({id,name,context_length,max_completion_tokens,pricing,supported_efforts},checked));
+}
+// Independent public OpenRouter snapshot, not inferred from direct-provider prices.
+const extraSeeds=JSON.parse(await readFile(new URL('./openrouter-extra-seeds.json',import.meta.url),'utf8'));
+for(const seed of extraSeeds){
+  const record=normalizeOpenRouter(seed,checked);
+  const index=models.findIndex(m=>m.id===record.id);
+  if(index>=0)models[index]=record;else models.push(record);
 }
 await writeFile(new URL('../public/data/catalog.json',import.meta.url), JSON.stringify({checked, currency:'USD', sources:urls, models},null,2)+'\n');
 console.log(`Wrote ${models.length} source-backed model routes.`);

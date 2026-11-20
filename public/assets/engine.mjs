@@ -5,18 +5,19 @@ export const DEFAULTS = Object.freeze({
   cache: 0, cacheWrite: 0, cacheRetention: 'short', cacheTokenHours: 0,
   search: 0, fileSearch: 0, code: 0, storage: 0, freeSearch: 0,
   customCalls: 0, customRate: 0, retries: 0, tier: 'standard', effort: 'all',
-  pricingDate: '2026-11-20', selected: 'openai:gpt-6.1-sol', orSearch: 'native',
-  providers: ['openai', 'google', 'anthropic', 'mistral', 'openrouter'], query: '', sort: 'provider'
+  pricingDate: '2026-11-20', selected: 'openai:gpt-6.1-sol', orSearch: 'native', offPeak: 0,
+  providers: ['openai', 'google', 'anthropic', 'mistral', 'deepseek', 'zai', 'kimi', 'openrouter'], query: '', sort: 'provider'
 });
 export function validate(s) {
   const errors = [];
-  for (const key of ['requests','rate','hours','days','input','output','reasoning','toolTokens','cache','cacheWrite','cacheTokenHours','search','fileSearch','code','storage','freeSearch','customCalls','customRate','retries']) {
+  for (const key of ['requests','rate','hours','days','input','output','reasoning','toolTokens','cache','cacheWrite','cacheTokenHours','search','fileSearch','code','storage','freeSearch','customCalls','customRate','retries','offPeak']) {
     if (typeof s[key] !== 'number' || !Number.isFinite(s[key]) || s[key] < 0) errors.push(`${key} must be a non-negative finite number.`);
   }
   if (s.hours > 24) errors.push('Active hours per day cannot exceed 24.');
   if (s.days <= 0 || s.days > 3660) errors.push('Estimate days must be between 1 and 3,660.');
   if (s.cache + s.cacheWrite > 100) errors.push('Cache reads and writes cannot exceed 100% of input.');
   if (s.retries > 1000) errors.push('Retry overhead cannot exceed 1,000%.');
+  if (s.offPeak > 100) errors.push('Off-peak workload percentage cannot exceed 100%.');
   if (!['total','rate'].includes(s.mode) || !['second','minute','hour','day'].includes(s.rateUnit)) errors.push('Choose a valid request-rate mode.');
   if (!['standard','batch'].includes(s.tier) || !['total','visible'].includes(s.outputMode)) errors.push('Choose a valid billing mode.');
   if (!/^\d{4}-\d{2}-\d{2}$/.test(s.pricingDate) || !Number.isFinite(Date.parse(s.pricingDate))) errors.push('Choose a valid pricing date.');
@@ -39,7 +40,11 @@ export function ratesFor(model, s, promptTokens) {
       longContext = true;
     }
   }
-  return { ...rates, longContext };
+  const offPeakFactor = model.offPeak ? 1 - (1 - model.offPeak.factor) * (s.offPeak || 0) / 100 : 1;
+  if (offPeakFactor !== 1) {
+    for (const key of ['input','output','cached','cacheWrite','reasoning']) if (typeof rates[key] === 'number') rates[key] *= offPeakFactor;
+  }
+  return { ...rates, longContext, offPeakFactor };
 }
 export function estimate(model, s) {
   const issues = validate(s), notes = [], v = volume(s);
@@ -53,6 +58,8 @@ export function estimate(model, s) {
   if (model.maxOutput && outputTokens > model.maxOutput) issues.push('Output exceeds the model output limit.');
   if (s.effort !== 'all' && !model.efforts?.includes(s.effort)) issues.push(`Reasoning effort “${s.effort}” is not advertised for this route.`);
   if (s.tier === 'batch' && !model.batch) issues.push('Batch pricing is not available in this catalog for this route.');
+  if (s.tier !== 'batch' && model.prepricedBatch) issues.push('This is a Batch-only route. Select Batch processing.');
+  if (s.tier === 'batch' && s.cacheWrite > 0 && model.batchCacheWrite === false) issues.push('Batch cache-write pricing is not separately verified for this route.');
   if (s.tier === 'batch' && (s.search || s.fileSearch || s.code)) issues.push('Native tools in Batch are not modeled; use Standard.');
   if (model.pricingUnsupported) issues.push('This route has conditional pricing not supported by this estimator.');
   if (model.promoEnd && s.pricingDate > model.promoEnd && !model.priceChanges?.some(c => c.date <= s.pricingDate)) issues.push('Published promotion has ended; update the rate before estimating.');
@@ -99,6 +106,7 @@ export function estimate(model, s) {
   const toolCost = tools.reduce((sum, t) => sum + t.cost, 0);
   const total = input + cacheRead + cacheWrite + output + reasoning + toolCost;
   if (r.longContext) notes.push('The entire request uses the published higher-context tier.');
+  if (model.offPeak) notes.push(`${s.offPeak || 0}% of requests assumed off-peak; all token rates use that weighted average. Peak/off-peak scheduling is manual, not inferred from the pricing date.`);
   if (model.note) notes.push(model.note);
   if (s.outputMode === 'visible' && s.reasoning === 0 && model.efforts?.some(e => e !== 'none')) notes.push('No extra reasoning tokens assumed. Measure thinking usage for a realistic forecast.');
   return { model, rates: r, requests: v.attempts, baseRequests: v.base, total, input, cacheRead, cacheWrite, output, reasoning, tools, toolCost, perRequest: v.attempts ? total / v.attempts : 0, perDay: total / s.days, monthly: total / s.days * 30, inputTokens: inputTokens * v.attempts, outputTokens: outputTokens * v.attempts, eligible: issues.length === 0, issues: [...new Set(issues)], notes: [...new Set(notes)] };
@@ -119,15 +127,16 @@ export function normalizeOpenRouter(item, checked = new Date().toISOString().sli
     for (const [from, to] of [['prompt','input'],['completion','output'],['input_cache_read','cached'],['input_cache_write','cacheWrite'],['input_cache_write_1h','cacheWriteLong']]) if (override[from] !== undefined) { if (million(override[from]) === null) pricingUnsupported = true; else rates[to] = million(override[from]); }
     contextPrices.push({ threshold: Number(override.min_prompt_tokens), rates });
   }
+  const contextLimits=[number(item.context_length),number(item.top_provider?.context_length)].filter(n=>n>0);
   return {
     id: `openrouter:${item.id}`, apiId: item.id, provider: 'openrouter', name: item.name,
     input: million(p.prompt), output: million(p.completion), cached: million(p.input_cache_read), cacheWrite: million(p.input_cache_write), cacheWriteLong: million(p.input_cache_write_1h),
     reasoningRate: million(p.internal_reasoning) ?? million(p.completion), requestFee: number(p.request) || 0,
-    context: number(item.context_length), maxOutput: number(item.top_provider?.max_completion_tokens ?? item.max_completion_tokens),
-    efforts: item.reasoning?.supported_efforts || item.supported_efforts || [], batch: false,
+    context: contextLimits.length ? Math.min(...contextLimits) : null, maxOutput: number(item.top_provider?.max_completion_tokens ?? item.max_completion_tokens),
+    efforts: item.reasoning?.supported_efforts || item.supported_efforts || [], batch: item.id.endsWith(':batch'), prepricedBatch: item.id.endsWith(':batch'), batchFactor: 1,
     contextPrices, pricingUnsupported,
     tools: p.web_search !== undefined && number(p.web_search) !== null ? { search: { name: 'Native web search', rate: number(p.web_search), unit: 'searches', source: 'https://openrouter.ai/api/v1/models', note: 'Native search rate advertised by this OpenRouter route; external search plugins have separate pricing.' } } : {},
-    source: 'https://openrouter.ai/api/v1/models', checked, note: 'OpenRouter routing prices may vary by endpoint. Credit-purchase fees are excluded.'
+    apiBase: 'https://openrouter.ai/api/v1', source: 'https://openrouter.ai/api/v1/models', checked, note: 'OpenRouter routing prices may vary by endpoint. Credit-purchase fees are excluded. Batch-only routes already contain their own discounted prices.'
   };
 }
 export function csvCell(value) { const text = typeof value === 'string' && /^[=+@\-\t\r]/.test(value) ? "'" + value : String(value ?? ''); return '"' + text.replaceAll('"', '""') + '"'; }

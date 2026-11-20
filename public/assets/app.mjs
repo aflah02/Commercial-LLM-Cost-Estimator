@@ -7,8 +7,8 @@ const money = (n, digits = 2) => new Intl.NumberFormat('en-US',{style:'currency'
 const compact = n => new Intl.NumberFormat('en-US',{notation:'compact',maximumFractionDigits:2}).format(n);
 const num = n => new Intl.NumberFormat('en-US',{maximumFractionDigits:2}).format(n);
 const per = n => money(n, n && n < .01 ? 6 : n && n < .1 ? 4 : 3);
-const providerNames = { openai:'OpenAI',google:'Google',anthropic:'Anthropic',mistral:'Mistral',openrouter:'OpenRouter',custom:'Custom' };
-const marks = { openai:'◉',google:'G',anthropic:'A',mistral:'M',openrouter:'⌘',custom:'◇' };
+const providerNames = { openai:'OpenAI',google:'Google',anthropic:'Anthropic',mistral:'Mistral',deepseek:'DeepSeek',zai:'Z.ai (GLM)',kimi:'Kimi',openrouter:'OpenRouter',custom:'Custom' };
+const marks = { openai:'◉',google:'G',anthropic:'A',mistral:'M',deepseek:'D',zai:'Z',kimi:'K',openrouter:'⌘',custom:'◇' };
 const storageKey = 'tokencost-scenario-v1';
 let state = structuredClone(DEFAULTS), customModels = [], catalog, models = [], results = [], formulaType = 'math', visibleLimit = 18, formulaText = '';
 let toastTimer;
@@ -19,6 +19,10 @@ function cleanState(value) {
   for (const key of Object.keys(DEFAULTS)) {
     if (key === 'providers') { if (Array.isArray(value.providers)) next.providers=value.providers.filter(p=>Object.hasOwn(providerNames,p)); }
     else if (typeof value[key] === typeof DEFAULTS[key]) next[key]=value[key];
+  }
+  // Older saved scenarios showing every original provider should also show the new providers.
+  if (['openai','google','anthropic','mistral','openrouter'].every(p=>next.providers.includes(p))) {
+    next.providers=[...new Set([...next.providers,'deepseek','zai','kimi'])];
   }
   return next;
 }
@@ -76,7 +80,7 @@ function renderSummary() {
   $('#token-share').textContent=r.eligible?`${r.total?Math.round((r.total-r.toolCost)/r.total*100):0}%`:'—';
   $('#legend').innerHTML=buckets.map(([label,cost,color])=>`<div class="legend-row"><i style="background:${color}"></i><span>${label}</span><strong>${r.eligible?money(cost):'—'}</strong></div>`).join('');
   const noteItems=[...r.issues.map(i=>`<li class="issue">${esc(i)}</li>`),...r.notes.slice(0,3).map(i=>`<li>${esc(i)}</li>`)];
-  $('#model-notes').innerHTML=`<a href="${esc(safeURL(r.model.source))}" target="_blank" rel="noopener noreferrer">Pricing source</a> · checked ${esc(r.model.checked||catalog.checked)}${noteItems.length?`<ul>${noteItems.join('')}</ul>`:''}`;
+  $('#model-notes').innerHTML=`<a href="${esc(safeURL(r.model.source))}" target="_blank" rel="noopener noreferrer">Pricing source</a> · checked ${esc(r.model.checked||catalog.checked)}${r.model.apiBase?`<br>Direct API: <a href="${esc(safeURL(r.model.apiBase))}" target="_blank" rel="noopener noreferrer">${esc(r.model.apiBase)}</a>`:''}${noteItems.length?`<ul>${noteItems.join('')}</ul>`:''}`;
   const fees=r.model.tools||{};
   $('#tool-rates').innerHTML=['search','fileSearch','code'].map(kind=>{const t=fees[kind];return `<div class="tool-rate">${{search:'Web search',fileSearch:'File retrieval',code:'Code execution'}[kind]}<strong>${t?`${money(t.rate, t.rate && t.rate<.01?4:3)} / ${esc(t.unit)}`:'Not verified for this route'}</strong>${t?`<a href="${esc(safeURL(t.source))}" target="_blank" rel="noopener noreferrer">Source</a>`:'Use a custom fee if applicable'}</div>`;}).join('');
 }
@@ -103,7 +107,7 @@ function renderFormula() {
   const s=state;
   const math=`TOTAL COST (USD)\n\nN = requests × (1 + retry overhead / 100)\n\nToken cost = N / 1,000,000 × (\n    uncached input tokens × input rate × token-tier factor\n  + cache-read tokens × cache-read rate × cache-tier factor\n  + cache-write tokens × cache-write rate × cache-tier factor\n  + answer tokens × output rate × token-tier factor\n  + additional reasoning tokens × reasoning rate × token-tier factor\n)\n\nTool cost = Σ (billable tool units × tool price)\n  + storage GB-days × storage price\n  + cached million-token-hours × cache storage price\n\nTotal cost = token cost + tool cost + route request fees\n\nCalling rate: N before retries = rate × active units/day × days\nBase input = uncached + cache reads + cache writes\nTool-result input is additional and uncached.\n\nSELECTED SCENARIO\n${r.model.name}\n${num(r.requests)} requests · ${num(s.input)} input · ${num(s.output)} output\n${r.eligible?money(r.total):'Incompatible scenario: '+r.issues.join(' ')}\n\nRates are USD per million tokens, resolved at the full prompt\nsize and pricing date before any Batch factor is applied.\nTotal-output mode already includes thinking; add reasoning only\nwhen the output input represents the visible answer alone.`;
   const js=`// Standalone, no dependencies. Replace model/workload for any model.\n// Rates: USD per million tokens. Tool rates: USD per named unit.\n// Context tiers, cache writes, retries, tools, and date changes included.\n// Inspect eligible/issues before using total.\n\n${validate.toString()}\n\n${volume.toString()}\n\n${ratesFor.toString()}\n\n${estimate.toString()}\n\nconst model = ${JSON.stringify(r.model,null,2)};\nconst workload = ${JSON.stringify(s,null,2)};\nconst result = estimate(model, workload);\nconsole.log({ eligible: result.eligible, issues: result.issues, totalUSD: result.total });`;
-  const choices={math,excel:numericFormula(r),javascript:js,rates:JSON.stringify({model:r.model.apiId,provider:r.model.provider,units:'USD per 1 million tokens; tool prices per stated unit',pricingDate:s.pricingDate,resolvedRates:r.rates,tools:r.model.tools,source:r.model.source},null,2)};
+  const choices={math:math+`\n\nDirect DeepSeek rates use the manual off-peak workload mix\n(currently ${s.offPeak}%). This weights token prices, not tool fees.\nOther provider and OpenRouter rates keep their own billing rules.`,excel:numericFormula(r),javascript:js,rates:JSON.stringify({model:r.model.apiId,provider:r.model.provider,apiBase:r.model.apiBase,units:'USD per 1 million tokens; tool prices per stated unit',pricingDate:s.pricingDate,resolvedRates:r.rates,tools:r.model.tools,source:r.model.source},null,2)};
   formulaText=choices[formulaType];$('#formula-code').textContent=formulaText;
   $('#formula-help').textContent={math:'Use the rates for your model, prompt size and processing tier. All configured calls, storage and request fees are included. No API requests are made.',excel:'A standalone Excel / Google Sheets formula with your current numeric inputs and resolved rates. Paste into any cell. Change the inputs here and copy again for a different combination.',javascript:'A reusable, standalone estimator with your selected model and scenario. Edit model rates and workload inputs to calculate any combination. Unavailable combinations return eligible: false with reasons.',rates:'Source-backed rates for the selected route, resolved for this pricing date and input length. Raw catalog records retain thresholds and known future changes.'}[formulaType];
   $$('[data-formula]').forEach(b=>{b.classList.toggle('selected',b.dataset.formula===formulaType);b.setAttribute('aria-pressed',String(b.dataset.formula===formulaType));});
@@ -134,6 +138,8 @@ async function refreshOpenRouter() {
   finally { button.disabled=false;button.textContent='↻ Refresh OpenRouter'; }
 }
 function bind() {
+  const timingLabel=document.createElement('label');timingLabel.className='field';timingLabel.innerHTML='DeepSeek off-peak workload <span class="muted">%</span><input data-state="offPeak" type="number" min="0" max="100" step="any" value="0"><span class="field-hint">Direct DeepSeek only. 0 = all peak; 100 = all off-peak. Use your expected request schedule.</span>';$('.advanced').insertBefore(timingLabel,$('.advanced .help'));
+  const retention=$('select[data-state="cacheRetention"]');retention.options[0].textContent='Short · OpenAI 30m / Claude & Kimi 5m';retention.options[1].textContent='Long · OpenAI 12h / Claude & Kimi 1h';
   const orLabel=document.createElement('label');orLabel.className='field';orLabel.innerHTML='OpenRouter search engine<select data-state="orSearch"><option value="native">Native · route-advertised rate</option><option value="exa-fast">Exa instant / fast / auto · $7 / 1K</option><option value="exa-deep">Exa deep / deep-lite · $12 / 1K</option><option value="exa-reasoning">Exa deep-reasoning · $15 / 1K</option><option value="parallel-fast">Parallel turbo / fast · $1 / 1K</option><option value="parallel-basic">Parallel basic / advanced · $5 / 1K</option><option value="perplexity">Perplexity Search · $5 / 1K</option></select><span class="field-hint">Applies only to OpenRouter routes</span>';$('.tools-grid').append(orLabel);
   document.addEventListener('input',event=>{
     const input=event.target;if(!input.matches('[data-state]'))return;

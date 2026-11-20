@@ -1,6 +1,6 @@
 # Commercial LLM Cost Estimator
 
-A static calculator for **OpenAI, Google Gemini, Anthropic Claude, Mistral, and OpenRouter**, built for GitHub Pages. Compare a single workload across providers, inspect token and tool costs, and copy the calculation into your own code or spreadsheet. No API keys, account, backend, or paid API calls.
+A static calculator for **OpenAI, Google Gemini, Anthropic Claude, Mistral, DeepSeek, Z.ai GLM, Kimi, and OpenRouter**, built for GitHub Pages. Compare a single workload across providers, inspect token and tool costs, and copy the calculation into your own code or spreadsheet. No API keys, account, backend, or paid API calls.
 
 ## Publish on GitHub Pages
 
@@ -14,10 +14,11 @@ Alternatively deploy `public/` directly from a branch, or serve the `dist/` outp
 
 ## Features
 
-- 42 initial routes: all published GPT-6.x and GPT-5.6 entries researched for this project, six Gemini models, seven Claude models, six Mistral models, and eight independently sourced OpenRouter routes.
+- 62 bundled routes across eight API providers: 15 OpenAI, six Gemini, seven Claude, six Mistral, two direct DeepSeek, five direct Z.ai GLM, three direct Kimi, and 18 independently sourced OpenRouter routes.
 - Total request count, or requests per second/minute/hour/day with active hours, estimate days, and retry overhead.
 - Total billed output versus visible answer plus additional reasoning. Effort filters use published route support and **never invent a token-price multiplier**.
 - Cache reads/writes, short/long write retention, context tiers, dated promotions, Batch token pricing, and context/output compatibility checks.
+- Direct DeepSeek peak/off-peak workload mix; direct Kimi's 60% Batch factor; separate provider and OpenRouter rates, capabilities and limits.
 - Native search, retrieval, code/container units, file/cache storage, tool-result tokens, remaining free-search allowance, and arbitrary custom tool fees.
 - OpenRouter external search presets for Exa, Parallel and Perplexity, plus advertised native search fees.
 - Search/filter/sort comparison, detailed breakdown, CSV export, local scenario persistence, shareable scenario URLs, and custom models.
@@ -86,11 +87,27 @@ Initial catalog verified **November 20, 2026**. Sources are embedded per route a
 - [Anthropic pricing](https://platform.claude.com/docs/en/about-claude/pricing)
 - [Mistral API pricing](https://docs.mistral.ai/inference/pricing)
 - [Mistral reasoning support](https://docs.mistral.ai/inference/conversations/reasoning)
+- [DeepSeek pricing and search fees](https://api-docs.deepseek.com/quick_start/pricing/)
+- [DeepSeek thinking modes](https://api-docs.deepseek.com/guides/thinking_mode/)
+- [Z.ai GLM API pricing](https://docs.z.ai/guides/overview/pricing)
+- [Kimi model prices](https://platform.kimi.ai/)
+- [Kimi Batch pricing](https://platform.kimi.ai/docs/pricing/batch)
+- [Kimi cache billing](https://platform.kimi.ai/docs/guide/context-caching)
 - [OpenRouter public models API](https://openrouter.ai/api/v1/models)
 - [OpenRouter model schema](https://openrouter.ai/docs/guides/overview/models)
 - [OpenRouter web search](https://openrouter.ai/tool/web-search/)
 
-Edit `scripts/catalog-source.mjs`, then run `node scripts/catalog-source.mjs` and `npm test` to update the committed snapshot. Avoid inferring OpenRouter rates from direct-provider rates. The public catalog refresh normalizes USD/token to USD/million and keeps route-specific effort support. Conditional rules that are not supported safely are flagged and excluded from compatible estimates.
+Edit `scripts/catalog-source.mjs` (and `scripts/openrouter-extra-seeds.json` for the additional raw OpenRouter snapshot), then run `node scripts/catalog-source.mjs` and `npm test` to update the committed snapshot. Avoid inferring OpenRouter rates from direct-provider rates. The public catalog refresh normalizes USD/token to USD/million and keeps route-specific effort support. Conditional rules that are not supported safely are flagged and excluded from compatible estimates.
+
+### New direct API routes
+
+| Service | API base | Bundled models |
+| --- | --- | --- |
+| DeepSeek | `https://api.deepseek.com` | `deepseek-flash`, `deepseek-v4-pro` |
+| Z.ai (international GLM PAYG) | `https://api.z.ai/api/paas/v4/` | `glm-5.3`, `glm-5.3-flash`, `glm-5.3-flashx`, `glm-5.3-flashx-legal`, `glm-5.2` |
+| Kimi (international) | `https://api.moonshot.ai/v1` | `kimi-k3.1-pro`, `kimi-k3.1-pro-highspeed`, `kimi-k3` |
+
+The OpenRouter snapshot additionally includes DeepSeek V4.1 Flash / V4 Pro 0813, GLM 5.3 / Flash / FlashX / Prime, Kimi K3.1 Pro / K3, and explicitly priced Batch variants. OpenRouter's route prices and advertised efforts can differ substantially from direct APIs.
 
 ## Billing assumptions and limits
 
@@ -98,7 +115,10 @@ Edit `scripts/catalog-source.mjs`, then run `node scripts/catalog-source.mjs` an
 - Google Gemini 4 Carbon/Argon promotions change on December 1, 2026; Flash pricing/storage changes on January 1, 2027. Those published changes are modeled. Unknown post-promotion OpenAI prices are flagged, not invented.
 - Gemini uses a different thinking-settings vocabulary; generic effort filtering does not claim direct support. Explicit Google cache-creation charges are not separately modeled; include actual creation input in your input budget and cache storage in million-token-hours. Gemini 4 is implicit-cache only.
 - A 5,000-token total output budget may be consumed by thinking before a visible answer. A 5,000-token visible answer can consume additional billed reasoning. Pro mode may aggregate more input/output work; enter measured billed token totals.
-- Native tools in Batch are not modeled; such combinations are excluded. OpenRouter `:batch` catalog variants already contain their own token rates and are not discounted again.
+- Native tools in Batch are not modeled; such combinations are excluded. OpenRouter `:batch` variants require Batch processing and already contain their own token rates; they are not discounted again.
+- DeepSeek's direct API uses **peak rates by default**. Set the off-peak workload percentage under advanced settings to blend peak and off-peak token rates. Off-peak is half price; peak is Monday–Friday 01:00–04:00 and 06:00–10:00 UTC, excluding Chinese public holidays. The app does not infer holiday calendars or assume your calling schedule from a date. This setting does not discount OpenRouter routes or tool fees. Native server search/fetch has no separate fee as of November 18, 2026; returned context is input. Standalone Search/Fetch APIs instead cost $0.75/1K successful calls and can use the custom-tool charge. Direct Batch, explicit cache-write and runtime fees are not assumed when unverified.
+- Direct Z.ai prices are international USD PAYG rates, not regional BigModel prices or Coding Plan points. GLM-5.3 cache reads are $0.26/M directly versus the independently advertised OpenRouter price. Native web search costs $0.01/use. Implicit cache storage is a limited-time free offering with no published expiry. Unknown Batch/code fees are excluded, not treated as free.
+- Direct Kimi K3.1 Pro/K3 Batch costs **60%** of Standard. Highspeed Batch and Batch cache-write prices are not verified and those combinations are excluded. Short cache-write charges replace the same cache-miss input portion instead of charging it twice. Only K3's 1h write rate ($6/M) is verified; other long writes require updated rates. K3-series thinking is always on directly (low/high/max); OpenRouter may advertise other choices for its own routes. Native Kimi search/code fees require a custom charge because the current official fee table could not be verified. K2 entries are omitted from the direct catalog because they are limited to existing accounts and scheduled for retirement.
 - Code units vary: OpenAI is **1 GB / 20-minute container sessions**; Anthropic is **container-hours** (minimum five minutes per session, free with applicable current search/fetch tool); Google is **executions** with no runtime fee. They are not equivalent workloads. Anthropic's 1,550 shared free monthly container hours are excluded; enter paid hours or use a custom charge for your actual allowance.
 - Free-search allowance is manual, defaults to zero, and represents remaining allowance for that estimate. It is shared by provider/project where applicable; comparing models does not create a new allowance for each deployed model.
 - Search-result, screenshot, schema, generated-code, and retrieved-file tokens must be included in token budgets. Mistral native tool fees were unavailable in fresh official docs; use a user-supplied custom fee. Unverified fees are not assumed to be zero.

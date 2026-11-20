@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="description" content="Compare commercial LLM API costs across OpenAI, Google, Anthropic, Mistral and OpenRouter. Model tokens, reasoning, caching, tool calls and request rates, and copy the formula.">
+  <meta name="description" content="Compare LLM API costs across OpenAI, Google, Anthropic, Mistral, DeepSeek, Z.ai GLM, Kimi and OpenRouter. Estimate tokens, reasoning, caching, tools and calling rates, and copy the formula.">
   <meta name="theme-color" content="#f6f8fc"><title>TokenCost — Commercial LLM Cost Estimator</title>
   <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="./assets/style.css"><script type="module" src="./assets/app.mjs"></script>
@@ -26,7 +26,7 @@
   <header class="topbar"><span>Workspace <span class="slash">/</span> <strong>Cost estimator</strong></span><span class="topbar-meta"><span class="pill">USD</span> No API key needed</span></header>
   <main id="main">
     <div class="page-heading"><div><div class="eyebrow">PLAN IT. COMPARE IT. BUILD IT.</div><h1>Big context. Clear costs.</h1><p>Understand what your AI workload will cost, before you scale it.</p></div><div class="heading-actions"><button class="button secondary" id="share">Copy scenario link</button><button class="button primary" id="export">Export CSV</button></div></div>
-    <div class="provider-strip" aria-label="Supported providers"><span>ONE WORKLOAD. FIVE WAYS TO RUN IT.</span><div><b class="provider-mark openai">◉</b> OpenAI</div><div><b class="provider-mark google">G</b> Google</div><div><b class="provider-mark anthropic">A</b> Anthropic</div><div><b class="provider-mark mistral">M</b> Mistral</div><div><b class="provider-mark openrouter">⌘</b> OpenRouter</div></div>
+    <div class="provider-strip" aria-label="Supported providers"><span>ONE WORKLOAD. EIGHT API PROVIDERS.</span><div><b class="provider-mark openai">◉</b> OpenAI</div><div><b class="provider-mark google">G</b> Google</div><div><b class="provider-mark anthropic">A</b> Anthropic</div><div><b class="provider-mark mistral">M</b> Mistral</div><div><b class="provider-mark deepseek">D</b> DeepSeek</div><div><b class="provider-mark zai">Z</b> Z.ai (GLM)</div><div><b class="provider-mark kimi">K</b> Kimi</div><div><b class="provider-mark openrouter">⌘</b> OpenRouter</div></div>
     <div id="errors" class="error-box" role="alert" hidden></div>
     <div class="estimator-grid">
       <section class="card workload" aria-labelledby="workload-heading">

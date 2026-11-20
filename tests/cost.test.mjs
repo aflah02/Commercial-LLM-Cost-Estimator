@@ -103,3 +103,66 @@ test('standalone JavaScript export works without imports or surrounding app stat
   const code=[validate,volume,ratesFor,estimate].map(fn=>fn.toString()).join('\n')+`\nestimate(${JSON.stringify(m)},${JSON.stringify(s)}).total`;
   close(vm.runInNewContext(code),31000);
 });
+test('DeepSeek, Z.ai and Kimi direct routes use their own published API rates',()=>{
+  for(const [id,total] of [
+    ['deepseek:deepseek-flash',3600],['deepseek:deepseek-v4-pro',15180],
+    ['zai:glm-5.3',16200],['zai:glm-5.3-flash',1750],['zai:glm-5.3-flashx',4325],['zai:glm-5.3-flashx-legal',4325],['zai:glm-5.2',16200],
+    ['kimi:kimi-k3.1-pro',25000],['kimi:kimi-k3.1-pro-highspeed',50000],['kimi:kimi-k3',37500]
+  ]) {
+    const m=model(id), r=estimate(m,config());assert.ok(m.apiBase.startsWith('https://'));assert.equal(r.eligible,true);close(r.total,total);
+  }
+  for(const provider of ['deepseek','zai','kimi'])assert.ok(DEFAULTS.providers.includes(provider));
+});
+test('DeepSeek off-peak mix weights token and cache rates, leaving other routes unchanged',()=>{
+  const m=model('deepseek:deepseek-flash');
+  close(estimate(m,config({offPeak:100})).total,1800);
+  close(estimate(m,config({offPeak:50})).total,2700);
+  close(estimate(m,config({offPeak:100,cache:100})).total,330);
+  close(estimate(model('openrouter:deepseek/deepseek-v4.1-flash'),config({offPeak:100})).total,3600);
+  close(estimate(model('zai:glm-5.3'),config({offPeak:100})).total,16200);
+  assert.ok(validate(config({offPeak:101})).length);assert.ok(validate(config({offPeak:-1})).length);
+});
+test('native DeepSeek search is fee-free but token-billed; Z.ai search is per use',()=>{
+  const deepseek=estimate(model('deepseek:deepseek-flash'),config({search:1,toolTokens:1000}));
+  assert.equal(deepseek.eligible,true);close(deepseek.toolCost,0);close(deepseek.total,3630);
+  const glm=estimate(model('zai:glm-5.3'),config({search:1}));assert.equal(glm.eligible,true);close(glm.toolCost,1000);close(glm.total,17200);
+  assert.equal(estimate(model('kimi:kimi-k3'),config({search:1})).eligible,false);
+});
+test('Kimi cache writes replace input, with verified long TTL and route-specific Batch pricing',()=>{
+  const k3=model('kimi:kimi-k3'),pro=model('kimi:kimi-k3.1-pro');
+  close(estimate(k3,config({cacheWrite:10})).total,37500);
+  close(estimate(k3,config({cacheWrite:10,cacheRetention:'long'})).total,40500);
+  close(estimate(pro,config({tier:'batch'})).total,15000);
+  close(estimate(k3,config({tier:'batch',cache:100})).total,6300);
+  assert.equal(estimate(pro,config({cacheWrite:10,cacheRetention:'long'})).eligible,false);
+  assert.equal(estimate(pro,config({tier:'batch',cacheWrite:10})).eligible,false);
+  assert.equal(estimate(model('kimi:kimi-k3.1-pro-highspeed'),config({tier:'batch'})).eligible,false);
+  assert.equal(estimate(model('deepseek:deepseek-flash'),config({tier:'batch'})).eligible,false);
+});
+test('direct and OpenRouter prices and effort support remain independent',()=>{
+  close(model('zai:glm-5.3').cached,.26);close(model('openrouter:z-ai/glm-5.3').cached,.0689);
+  close(estimate(model('openrouter:z-ai/glm-5.3'),config()).total,1399);
+  close(estimate(model('openrouter:moonshotai/kimi-k3.1-pro'),config()).total,6930);
+  assert.equal(estimate(model('kimi:kimi-k3.1-pro'),config({effort:'none'})).eligible,false);
+  assert.equal(estimate(model('openrouter:moonshotai/kimi-k3.1-pro'),config({effort:'none'})).eligible,true);
+  assert.equal(estimate(model('zai:glm-5.3'),config({effort:'medium'})).eligible,false);
+});
+test('OpenRouter Batch-only routes are not discounted a second time',()=>{
+  const m=model('openrouter:moonshotai/kimi-k3.1-pro:batch');
+  assert.equal(estimate(m,config()).eligible,false);
+  const r=estimate(m,config({tier:'batch'}));assert.equal(r.eligible,true);close(r.total,6511.5);
+  const bounds=model('openrouter:z-ai/glm-5.3:batch');assert.equal(bounds.context,1048575);
+  assert.equal(normalizeOpenRouter({id:'unknown',name:'Unknown',pricing:{prompt:'0',completion:'0'}}).context,null);
+});
+test('copied formulas include DeepSeek time mixtures and Kimi 60% Batch pricing',()=>{
+  for(const [id,s] of [
+    ['deepseek:deepseek-flash',config({offPeak:37.5,cache:45,search:1,toolTokens:777,outputMode:'visible',reasoning:8000})],
+    ['kimi:kimi-k3',config({tier:'batch',cache:25})],
+    ['openrouter:moonshotai/kimi-k3.1-pro:batch',config({tier:'batch'})]
+  ]) {
+    const m=model(id),r=estimate(m,s);assert.equal(r.eligible,true);
+    close(vm.runInNewContext(spreadsheetFormula(r,s).slice(1)),r.total);
+    const code=[validate,volume,ratesFor,estimate].map(fn=>fn.toString()).join('\n')+`\nestimate(${JSON.stringify(m)},${JSON.stringify(s)}).total`;
+    close(vm.runInNewContext(code),r.total);
+  }
+});

@@ -6,6 +6,9 @@
     "google": "https://aistudio.google.com/docs/pricing",
     "anthropic": "https://platform.claude.com/docs/en/about-claude/pricing",
     "mistral": "https://docs.mistral.ai/inference/pricing",
+    "deepseek": "https://api-docs.deepseek.com/quick_start/pricing/",
+    "zai": "https://docs.z.ai/guides/overview/pricing",
+    "kimi": "https://platform.kimi.ai/",
     "openrouter": "https://openrouter.ai/api/v1/models"
   },
   "models": [
@@ -1592,6 +1595,312 @@
       "note": "Native tool fees are not freshly verified. Use the custom-tool charge for Conversations/Agents tools; do not assume they are free. Max output limit is not verified."
     },
     {
+      "id": "deepseek:deepseek-flash",
+      "apiId": "deepseek-flash",
+      "provider": "deepseek",
+      "name": "DeepSeek V4.1 Flash 1017",
+      "input": 0.3,
+      "output": 1.2,
+      "checked": "2026-11-20",
+      "source": "https://api-docs.deepseek.com/quick_start/pricing/",
+      "batch": false,
+      "batchFactor": 0.5,
+      "context": 1048576,
+      "maxOutput": 393216,
+      "tools": {
+        "search": {
+          "name": "Model-triggered server-side search",
+          "rate": 0,
+          "unit": "search calls",
+          "source": "https://api-docs.deepseek.com/quick_start/pricing/",
+          "note": "Server-side search/fetch has no separate fee from November 18, 2026; result tokens are input. Standalone Search/Fetch APIs instead cost $0.75 / 1K successful calls; use a custom fee for those."
+        }
+      },
+      "cached": 0.006,
+      "apiBase": "https://api.deepseek.com",
+      "efforts": [
+        "none",
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "offPeak": {
+        "factor": 0.5
+      },
+      "note": "Direct API peak rates. Off-peak is 50%: all hours except weekdays 01–04 and 06–10 UTC, excluding Chinese public holidays. Caching is automatic. Medium/xhigh map to high; none disables thinking. No verified Batch discount."
+    },
+    {
+      "id": "deepseek:deepseek-v4-pro",
+      "apiId": "deepseek-v4-pro",
+      "provider": "deepseek",
+      "name": "DeepSeek V4 Pro 0813",
+      "input": 1.32,
+      "output": 3.96,
+      "checked": "2026-11-20",
+      "source": "https://api-docs.deepseek.com/quick_start/pricing/",
+      "batch": false,
+      "batchFactor": 0.5,
+      "context": 1048576,
+      "maxOutput": 393216,
+      "tools": {
+        "search": {
+          "name": "Model-triggered server-side search",
+          "rate": 0,
+          "unit": "search calls",
+          "source": "https://api-docs.deepseek.com/quick_start/pricing/",
+          "note": "Server-side search/fetch has no separate fee from November 18, 2026; result tokens are input. Standalone Search/Fetch APIs instead cost $0.75 / 1K successful calls; use a custom fee for those."
+        }
+      },
+      "cached": 0.044,
+      "apiBase": "https://api.deepseek.com",
+      "efforts": [
+        "none",
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "offPeak": {
+        "factor": 0.5
+      },
+      "note": "Direct API peak rates. Off-peak is 50%: all hours except weekdays 01–04 and 06–10 UTC, excluding Chinese public holidays. Caching is automatic. Medium/xhigh map to high; none disables thinking. No verified Batch discount."
+    },
+    {
+      "id": "zai:glm-5.3",
+      "apiId": "glm-5.3",
+      "provider": "zai",
+      "name": "GLM-5.3",
+      "input": 1.4,
+      "output": 4.4,
+      "checked": "2026-11-20",
+      "source": "https://docs.z.ai/guides/overview/pricing",
+      "batch": false,
+      "batchFactor": 0.5,
+      "context": 1000000,
+      "maxOutput": 128000,
+      "tools": {
+        "search": {
+          "name": "Z.ai web search",
+          "rate": 0.01,
+          "unit": "uses",
+          "source": "https://docs.z.ai/guides/overview/pricing",
+          "note": "Direct Z.ai PAYG tool pricing. Include search-result tokens in the input budget."
+        }
+      },
+      "cached": 0.26,
+      "apiBase": "https://api.z.ai/api/paas/v4/",
+      "efforts": [
+        "low",
+        "high",
+        "max"
+      ],
+      "note": "International Z.ai PAYG API, separate from Coding Plan points and other regional services. Automatic cache; storage is currently a limited-time free offering. No verified Batch discount. GLM-5.3 general models always think; GLM-5.2 accepts compatibility effort aliases."
+    },
+    {
+      "id": "zai:glm-5.3-flash",
+      "apiId": "glm-5.3-flash",
+      "provider": "zai",
+      "name": "GLM-5.3 Flash",
+      "input": 0.15,
+      "output": 0.5,
+      "checked": "2026-11-20",
+      "source": "https://docs.z.ai/guides/overview/pricing",
+      "batch": false,
+      "batchFactor": 0.5,
+      "context": 1000000,
+      "maxOutput": 128000,
+      "tools": {
+        "search": {
+          "name": "Z.ai web search",
+          "rate": 0.01,
+          "unit": "uses",
+          "source": "https://docs.z.ai/guides/overview/pricing",
+          "note": "Direct Z.ai PAYG tool pricing. Include search-result tokens in the input budget."
+        }
+      },
+      "cached": 0.03,
+      "apiBase": "https://api.z.ai/api/paas/v4/",
+      "efforts": [
+        "low",
+        "high",
+        "max"
+      ],
+      "note": "International Z.ai PAYG API, separate from Coding Plan points and other regional services. Automatic cache; storage is currently a limited-time free offering. No verified Batch discount. GLM-5.3 general models always think; GLM-5.2 accepts compatibility effort aliases."
+    },
+    {
+      "id": "zai:glm-5.3-flashx",
+      "apiId": "glm-5.3-flashx",
+      "provider": "zai",
+      "name": "GLM-5.3 FlashX",
+      "input": 0.37,
+      "output": 1.25,
+      "checked": "2026-11-20",
+      "source": "https://docs.z.ai/guides/overview/pricing",
+      "batch": false,
+      "batchFactor": 0.5,
+      "context": 1000000,
+      "maxOutput": 128000,
+      "tools": {
+        "search": {
+          "name": "Z.ai web search",
+          "rate": 0.01,
+          "unit": "uses",
+          "source": "https://docs.z.ai/guides/overview/pricing",
+          "note": "Direct Z.ai PAYG tool pricing. Include search-result tokens in the input budget."
+        }
+      },
+      "cached": 0.075,
+      "apiBase": "https://api.z.ai/api/paas/v4/",
+      "efforts": [
+        "low",
+        "high",
+        "max"
+      ],
+      "note": "International Z.ai PAYG API, separate from Coding Plan points and other regional services. Automatic cache; storage is currently a limited-time free offering. No verified Batch discount. GLM-5.3 general models always think; GLM-5.2 accepts compatibility effort aliases."
+    },
+    {
+      "id": "zai:glm-5.3-flashx-legal",
+      "apiId": "glm-5.3-flashx-legal",
+      "provider": "zai",
+      "name": "GLM-5.3 FlashX Legal",
+      "input": 0.37,
+      "output": 1.25,
+      "checked": "2026-11-20",
+      "source": "https://docs.z.ai/guides/overview/pricing",
+      "batch": false,
+      "batchFactor": 0.5,
+      "context": 1000000,
+      "maxOutput": 128000,
+      "tools": {
+        "search": {
+          "name": "Z.ai web search",
+          "rate": 0.01,
+          "unit": "uses",
+          "source": "https://docs.z.ai/guides/overview/pricing",
+          "note": "Direct Z.ai PAYG tool pricing. Include search-result tokens in the input budget."
+        }
+      },
+      "cached": 0.075,
+      "apiBase": "https://api.z.ai/api/paas/v4/",
+      "efforts": [],
+      "note": "International Z.ai PAYG API, separate from Coding Plan points and other regional services. Automatic cache; storage is currently a limited-time free offering. No verified Batch discount. GLM-5.3 general models always think; GLM-5.2 accepts compatibility effort aliases."
+    },
+    {
+      "id": "zai:glm-5.2",
+      "apiId": "glm-5.2",
+      "provider": "zai",
+      "name": "GLM-5.2",
+      "input": 1.4,
+      "output": 4.4,
+      "checked": "2026-11-20",
+      "source": "https://docs.z.ai/guides/overview/pricing",
+      "batch": false,
+      "batchFactor": 0.5,
+      "context": 1000000,
+      "maxOutput": 128000,
+      "tools": {
+        "search": {
+          "name": "Z.ai web search",
+          "rate": 0.01,
+          "unit": "uses",
+          "source": "https://docs.z.ai/guides/overview/pricing",
+          "note": "Direct Z.ai PAYG tool pricing. Include search-result tokens in the input budget."
+        }
+      },
+      "cached": 0.26,
+      "apiBase": "https://api.z.ai/api/paas/v4/",
+      "efforts": [
+        "none",
+        "low",
+        "medium",
+        "high",
+        "xhigh",
+        "max"
+      ],
+      "note": "International Z.ai PAYG API, separate from Coding Plan points and other regional services. Automatic cache; storage is currently a limited-time free offering. No verified Batch discount. GLM-5.3 general models always think; GLM-5.2 accepts compatibility effort aliases."
+    },
+    {
+      "id": "kimi:kimi-k3.1-pro",
+      "apiId": "kimi-k3.1-pro",
+      "provider": "kimi",
+      "name": "Kimi K3.1 Pro",
+      "input": 2,
+      "output": 10,
+      "checked": "2026-11-20",
+      "source": "https://platform.kimi.ai/",
+      "batch": true,
+      "batchFactor": 0.6,
+      "context": 1048576,
+      "maxOutput": 1048576,
+      "tools": {},
+      "cached": 0.2,
+      "cacheWrite": 2,
+      "cacheWriteLong": null,
+      "batchCacheWrite": false,
+      "apiBase": "https://api.moonshot.ai/v1",
+      "efforts": [
+        "low",
+        "high",
+        "max"
+      ],
+      "note": "International Kimi API; thinking is always on. Standard K3/K3.1 Pro Batch costs 60% of Standard. Cache writes replace the same cache-miss input portion; short TTL 5m, long 1h (only K3 long-write rate verified). Native tool fees require a custom charge."
+    },
+    {
+      "id": "kimi:kimi-k3.1-pro-highspeed",
+      "apiId": "kimi-k3.1-pro-highspeed",
+      "provider": "kimi",
+      "name": "Kimi K3.1 Pro Highspeed",
+      "input": 4,
+      "output": 20,
+      "checked": "2026-11-20",
+      "source": "https://platform.kimi.ai/",
+      "batch": false,
+      "batchFactor": 0.6,
+      "context": 1048576,
+      "maxOutput": 1048576,
+      "tools": {},
+      "cached": 0.2,
+      "cacheWrite": 4,
+      "cacheWriteLong": null,
+      "batchCacheWrite": false,
+      "apiBase": "https://api.moonshot.ai/v1",
+      "efforts": [
+        "low",
+        "high",
+        "max"
+      ],
+      "note": "International Kimi API; thinking is always on. Standard K3/K3.1 Pro Batch costs 60% of Standard. Cache writes replace the same cache-miss input portion; short TTL 5m, long 1h (only K3 long-write rate verified). Native tool fees require a custom charge."
+    },
+    {
+      "id": "kimi:kimi-k3",
+      "apiId": "kimi-k3",
+      "provider": "kimi",
+      "name": "Kimi K3",
+      "input": 3,
+      "output": 15,
+      "checked": "2026-11-20",
+      "source": "https://platform.kimi.ai/",
+      "batch": true,
+      "batchFactor": 0.6,
+      "context": 1048576,
+      "maxOutput": 1048576,
+      "tools": {},
+      "cached": 0.3,
+      "cacheWrite": 3,
+      "cacheWriteLong": 6,
+      "batchCacheWrite": false,
+      "apiBase": "https://api.moonshot.ai/v1",
+      "efforts": [
+        "low",
+        "high",
+        "max"
+      ],
+      "note": "International Kimi API; thinking is always on. Standard K3/K3.1 Pro Batch costs 60% of Standard. Cache writes replace the same cache-miss input portion; short TTL 5m, long 1h (only K3 long-write rate verified). Native tool fees require a custom charge."
+    },
+    {
       "id": "openrouter:openai/gpt-6.2-astra",
       "apiId": "openai/gpt-6.2-astra",
       "provider": "openrouter",
@@ -1613,6 +1922,8 @@
         "max"
       ],
       "batch": false,
+      "prepricedBatch": false,
+      "batchFactor": 1,
       "contextPrices": [
         {
           "threshold": 272000,
@@ -1634,9 +1945,10 @@
           "note": "Native search rate advertised by this OpenRouter route; external search plugins have separate pricing."
         }
       },
+      "apiBase": "https://openrouter.ai/api/v1",
       "source": "https://openrouter.ai/api/v1/models",
       "checked": "2026-11-20",
-      "note": "OpenRouter routing prices may vary by endpoint. Credit-purchase fees are excluded."
+      "note": "OpenRouter routing prices may vary by endpoint. Credit-purchase fees are excluded. Batch-only routes already contain their own discounted prices."
     },
     {
       "id": "openrouter:openai/gpt-6.2-sol",
@@ -1660,6 +1972,8 @@
         "max"
       ],
       "batch": false,
+      "prepricedBatch": false,
+      "batchFactor": 1,
       "contextPrices": [
         {
           "threshold": 272000,
@@ -1681,9 +1995,10 @@
           "note": "Native search rate advertised by this OpenRouter route; external search plugins have separate pricing."
         }
       },
+      "apiBase": "https://openrouter.ai/api/v1",
       "source": "https://openrouter.ai/api/v1/models",
       "checked": "2026-11-20",
-      "note": "OpenRouter routing prices may vary by endpoint. Credit-purchase fees are excluded."
+      "note": "OpenRouter routing prices may vary by endpoint. Credit-purchase fees are excluded. Batch-only routes already contain their own discounted prices."
     },
     {
       "id": "openrouter:anthropic/claude-fable-5.2",
@@ -1707,6 +2022,8 @@
         "max"
       ],
       "batch": false,
+      "prepricedBatch": false,
+      "batchFactor": 1,
       "contextPrices": [],
       "pricingUnsupported": false,
       "tools": {
@@ -1718,9 +2035,10 @@
           "note": "Native search rate advertised by this OpenRouter route; external search plugins have separate pricing."
         }
       },
+      "apiBase": "https://openrouter.ai/api/v1",
       "source": "https://openrouter.ai/api/v1/models",
       "checked": "2026-11-20",
-      "note": "OpenRouter routing prices may vary by endpoint. Credit-purchase fees are excluded."
+      "note": "OpenRouter routing prices may vary by endpoint. Credit-purchase fees are excluded. Batch-only routes already contain their own discounted prices."
     },
     {
       "id": "openrouter:anthropic/claude-sonnet-5.5",
@@ -1744,6 +2062,8 @@
         "max"
       ],
       "batch": false,
+      "prepricedBatch": false,
+      "batchFactor": 1,
       "contextPrices": [],
       "pricingUnsupported": false,
       "tools": {
@@ -1755,9 +2075,10 @@
           "note": "Native search rate advertised by this OpenRouter route; external search plugins have separate pricing."
         }
       },
+      "apiBase": "https://openrouter.ai/api/v1",
       "source": "https://openrouter.ai/api/v1/models",
       "checked": "2026-11-20",
-      "note": "OpenRouter routing prices may vary by endpoint. Credit-purchase fees are excluded."
+      "note": "OpenRouter routing prices may vary by endpoint. Credit-purchase fees are excluded. Batch-only routes already contain their own discounted prices."
     },
     {
       "id": "openrouter:google/gemini-4-neon",
@@ -1780,6 +2101,8 @@
         "xhigh"
       ],
       "batch": false,
+      "prepricedBatch": false,
+      "batchFactor": 1,
       "contextPrices": [],
       "pricingUnsupported": false,
       "tools": {
@@ -1791,9 +2114,10 @@
           "note": "Native search rate advertised by this OpenRouter route; external search plugins have separate pricing."
         }
       },
+      "apiBase": "https://openrouter.ai/api/v1",
       "source": "https://openrouter.ai/api/v1/models",
       "checked": "2026-11-20",
-      "note": "OpenRouter routing prices may vary by endpoint. Credit-purchase fees are excluded."
+      "note": "OpenRouter routing prices may vary by endpoint. Credit-purchase fees are excluded. Batch-only routes already contain their own discounted prices."
     },
     {
       "id": "openrouter:mistralai/mistral-large-4-0",
@@ -1814,12 +2138,15 @@
         "high"
       ],
       "batch": false,
+      "prepricedBatch": false,
+      "batchFactor": 1,
       "contextPrices": [],
       "pricingUnsupported": false,
       "tools": {},
+      "apiBase": "https://openrouter.ai/api/v1",
       "source": "https://openrouter.ai/api/v1/models",
       "checked": "2026-11-20",
-      "note": "OpenRouter routing prices may vary by endpoint. Credit-purchase fees are excluded."
+      "note": "OpenRouter routing prices may vary by endpoint. Credit-purchase fees are excluded. Batch-only routes already contain their own discounted prices."
     },
     {
       "id": "openrouter:deepseek/deepseek-v4.1-flash",
@@ -1836,18 +2163,21 @@
       "context": 1048576,
       "maxOutput": 943718,
       "efforts": [
-        "none",
-        "low",
+        "max",
         "high",
-        "max"
+        "low",
+        "none"
       ],
       "batch": false,
+      "prepricedBatch": false,
+      "batchFactor": 1,
       "contextPrices": [],
       "pricingUnsupported": false,
       "tools": {},
+      "apiBase": "https://openrouter.ai/api/v1",
       "source": "https://openrouter.ai/api/v1/models",
       "checked": "2026-11-20",
-      "note": "OpenRouter routing prices may vary by endpoint. Credit-purchase fees are excluded."
+      "note": "OpenRouter routing prices may vary by endpoint. Credit-purchase fees are excluded. Batch-only routes already contain their own discounted prices."
     },
     {
       "id": "openrouter:anthropic/claude-fable-5.1",
@@ -1871,6 +2201,8 @@
         "max"
       ],
       "batch": false,
+      "prepricedBatch": false,
+      "batchFactor": 1,
       "contextPrices": [],
       "pricingUnsupported": false,
       "tools": {
@@ -1882,9 +2214,315 @@
           "note": "Native search rate advertised by this OpenRouter route; external search plugins have separate pricing."
         }
       },
+      "apiBase": "https://openrouter.ai/api/v1",
       "source": "https://openrouter.ai/api/v1/models",
       "checked": "2026-11-20",
-      "note": "OpenRouter routing prices may vary by endpoint. Credit-purchase fees are excluded."
+      "note": "OpenRouter routing prices may vary by endpoint. Credit-purchase fees are excluded. Batch-only routes already contain their own discounted prices."
+    },
+    {
+      "id": "openrouter:deepseek/deepseek-v4-pro-0813",
+      "apiId": "deepseek/deepseek-v4-pro-0813",
+      "provider": "openrouter",
+      "name": "DeepSeek: DeepSeek V4 Pro 0813",
+      "input": 1.32,
+      "output": 3.9600000000000004,
+      "cached": 0.044,
+      "cacheWrite": null,
+      "cacheWriteLong": null,
+      "reasoningRate": 3.9600000000000004,
+      "requestFee": 0,
+      "context": 1048576,
+      "maxOutput": 943718,
+      "efforts": [
+        "max",
+        "high",
+        "low",
+        "none"
+      ],
+      "batch": false,
+      "prepricedBatch": false,
+      "batchFactor": 1,
+      "contextPrices": [],
+      "pricingUnsupported": false,
+      "tools": {},
+      "apiBase": "https://openrouter.ai/api/v1",
+      "source": "https://openrouter.ai/api/v1/models",
+      "checked": "2026-11-20",
+      "note": "OpenRouter routing prices may vary by endpoint. Credit-purchase fees are excluded. Batch-only routes already contain their own discounted prices."
+    },
+    {
+      "id": "openrouter:z-ai/glm-5.3",
+      "apiId": "z-ai/glm-5.3",
+      "provider": "openrouter",
+      "name": "Z.ai: GLM 5.3",
+      "input": 0.0699,
+      "output": 1.4,
+      "cached": 0.0689,
+      "cacheWrite": null,
+      "cacheWriteLong": null,
+      "reasoningRate": 1.4,
+      "requestFee": 0,
+      "context": 1048576,
+      "maxOutput": 943718,
+      "efforts": [
+        "max",
+        "high",
+        "low"
+      ],
+      "batch": false,
+      "prepricedBatch": false,
+      "batchFactor": 1,
+      "contextPrices": [],
+      "pricingUnsupported": false,
+      "tools": {},
+      "apiBase": "https://openrouter.ai/api/v1",
+      "source": "https://openrouter.ai/api/v1/models",
+      "checked": "2026-11-20",
+      "note": "OpenRouter routing prices may vary by endpoint. Credit-purchase fees are excluded. Batch-only routes already contain their own discounted prices."
+    },
+    {
+      "id": "openrouter:z-ai/glm-5.3-flash",
+      "apiId": "z-ai/glm-5.3-flash",
+      "provider": "openrouter",
+      "name": "Z.ai: GLM 5.3 Flash",
+      "input": 0.0399,
+      "output": 0.0784,
+      "cached": 0.03,
+      "cacheWrite": null,
+      "cacheWriteLong": null,
+      "reasoningRate": 0.0784,
+      "requestFee": 0,
+      "context": 1048576,
+      "maxOutput": 131072,
+      "efforts": [
+        "max",
+        "high",
+        "low"
+      ],
+      "batch": false,
+      "prepricedBatch": false,
+      "batchFactor": 1,
+      "contextPrices": [],
+      "pricingUnsupported": false,
+      "tools": {},
+      "apiBase": "https://openrouter.ai/api/v1",
+      "source": "https://openrouter.ai/api/v1/models",
+      "checked": "2026-11-20",
+      "note": "OpenRouter routing prices may vary by endpoint. Credit-purchase fees are excluded. Batch-only routes already contain their own discounted prices."
+    },
+    {
+      "id": "openrouter:z-ai/glm-5.3-flashx",
+      "apiId": "z-ai/glm-5.3-flashx",
+      "provider": "openrouter",
+      "name": "Z.ai: GLM 5.3 FlashX",
+      "input": 0.37,
+      "output": 1.25,
+      "cached": 0.075,
+      "cacheWrite": null,
+      "cacheWriteLong": null,
+      "reasoningRate": 1.25,
+      "requestFee": 0,
+      "context": 1048576,
+      "maxOutput": 131072,
+      "efforts": [
+        "max",
+        "high",
+        "low"
+      ],
+      "batch": false,
+      "prepricedBatch": false,
+      "batchFactor": 1,
+      "contextPrices": [],
+      "pricingUnsupported": false,
+      "tools": {},
+      "apiBase": "https://openrouter.ai/api/v1",
+      "source": "https://openrouter.ai/api/v1/models",
+      "checked": "2026-11-20",
+      "note": "OpenRouter routing prices may vary by endpoint. Credit-purchase fees are excluded. Batch-only routes already contain their own discounted prices."
+    },
+    {
+      "id": "openrouter:z-ai/glm-5.3-prime",
+      "apiId": "z-ai/glm-5.3-prime",
+      "provider": "openrouter",
+      "name": "Z.ai: GLM 5.3 Prime",
+      "input": 1.68,
+      "output": 5.28,
+      "cached": 0.33599999999999997,
+      "cacheWrite": null,
+      "cacheWriteLong": null,
+      "reasoningRate": 5.28,
+      "requestFee": 0,
+      "context": 1000000,
+      "maxOutput": 131072,
+      "efforts": [
+        "max",
+        "high",
+        "low"
+      ],
+      "batch": false,
+      "prepricedBatch": false,
+      "batchFactor": 1,
+      "contextPrices": [],
+      "pricingUnsupported": false,
+      "tools": {},
+      "apiBase": "https://openrouter.ai/api/v1",
+      "source": "https://openrouter.ai/api/v1/models",
+      "checked": "2026-11-20",
+      "note": "OpenRouter routing prices may vary by endpoint. Credit-purchase fees are excluded. Batch-only routes already contain their own discounted prices."
+    },
+    {
+      "id": "openrouter:moonshotai/kimi-k3.1-pro",
+      "apiId": "moonshotai/kimi-k3.1-pro",
+      "provider": "openrouter",
+      "name": "MoonshotAI: Kimi K3.1 Pro",
+      "input": 0.253,
+      "output": 8.8,
+      "cached": 0.18,
+      "cacheWrite": null,
+      "cacheWriteLong": null,
+      "reasoningRate": 8.8,
+      "requestFee": 0,
+      "context": 1048576,
+      "maxOutput": 943718,
+      "efforts": [
+        "max",
+        "high",
+        "low",
+        "none"
+      ],
+      "batch": false,
+      "prepricedBatch": false,
+      "batchFactor": 1,
+      "contextPrices": [],
+      "pricingUnsupported": false,
+      "tools": {},
+      "apiBase": "https://openrouter.ai/api/v1",
+      "source": "https://openrouter.ai/api/v1/models",
+      "checked": "2026-11-20",
+      "note": "OpenRouter routing prices may vary by endpoint. Credit-purchase fees are excluded. Batch-only routes already contain their own discounted prices."
+    },
+    {
+      "id": "openrouter:moonshotai/kimi-k3",
+      "apiId": "moonshotai/kimi-k3",
+      "provider": "openrouter",
+      "name": "MoonshotAI: Kimi K3",
+      "input": 0.192,
+      "output": 16,
+      "cached": 0.182,
+      "cacheWrite": null,
+      "cacheWriteLong": null,
+      "reasoningRate": 16,
+      "requestFee": 0,
+      "context": 1048576,
+      "maxOutput": 943718,
+      "efforts": [
+        "max",
+        "high",
+        "low",
+        "none"
+      ],
+      "batch": false,
+      "prepricedBatch": false,
+      "batchFactor": 1,
+      "contextPrices": [],
+      "pricingUnsupported": false,
+      "tools": {},
+      "apiBase": "https://openrouter.ai/api/v1",
+      "source": "https://openrouter.ai/api/v1/models",
+      "checked": "2026-11-20",
+      "note": "OpenRouter routing prices may vary by endpoint. Credit-purchase fees are excluded. Batch-only routes already contain their own discounted prices."
+    },
+    {
+      "id": "openrouter:moonshotai/kimi-k3.1-pro:batch",
+      "apiId": "moonshotai/kimi-k3.1-pro:batch",
+      "provider": "openrouter",
+      "name": "MoonshotAI: Kimi K3.1 Pro (batch)",
+      "input": 0.372,
+      "output": 5.582999999999999,
+      "cached": 0.09999999999999999,
+      "cacheWrite": null,
+      "cacheWriteLong": null,
+      "reasoningRate": 5.582999999999999,
+      "requestFee": 0,
+      "context": 1048576,
+      "maxOutput": 943718,
+      "efforts": [
+        "max",
+        "high",
+        "low",
+        "none"
+      ],
+      "batch": true,
+      "prepricedBatch": true,
+      "batchFactor": 1,
+      "contextPrices": [],
+      "pricingUnsupported": false,
+      "tools": {},
+      "apiBase": "https://openrouter.ai/api/v1",
+      "source": "https://openrouter.ai/api/v1/models",
+      "checked": "2026-11-20",
+      "note": "OpenRouter routing prices may vary by endpoint. Credit-purchase fees are excluded. Batch-only routes already contain their own discounted prices."
+    },
+    {
+      "id": "openrouter:z-ai/glm-5.3:batch",
+      "apiId": "z-ai/glm-5.3:batch",
+      "provider": "openrouter",
+      "name": "Z.ai: GLM 5.3 (batch)",
+      "input": 0.28,
+      "output": 1.249,
+      "cached": 0.061000000000000006,
+      "cacheWrite": null,
+      "cacheWriteLong": null,
+      "reasoningRate": 1.249,
+      "requestFee": 0,
+      "context": 1048575,
+      "maxOutput": 943717,
+      "efforts": [
+        "max",
+        "high",
+        "low"
+      ],
+      "batch": true,
+      "prepricedBatch": true,
+      "batchFactor": 1,
+      "contextPrices": [],
+      "pricingUnsupported": false,
+      "tools": {},
+      "apiBase": "https://openrouter.ai/api/v1",
+      "source": "https://openrouter.ai/api/v1/models",
+      "checked": "2026-11-20",
+      "note": "OpenRouter routing prices may vary by endpoint. Credit-purchase fees are excluded. Batch-only routes already contain their own discounted prices."
+    },
+    {
+      "id": "openrouter:deepseek/deepseek-v4.1-flash:batch",
+      "apiId": "deepseek/deepseek-v4.1-flash:batch",
+      "provider": "openrouter",
+      "name": "DeepSeek: DeepSeek V4.1 Flash (batch)",
+      "input": 0.049999999999999996,
+      "output": 0.15,
+      "cached": 0.004,
+      "cacheWrite": null,
+      "cacheWriteLong": null,
+      "reasoningRate": 0.15,
+      "requestFee": 0,
+      "context": 1048576,
+      "maxOutput": 384000,
+      "efforts": [
+        "max",
+        "high",
+        "low",
+        "none"
+      ],
+      "batch": true,
+      "prepricedBatch": true,
+      "batchFactor": 1,
+      "contextPrices": [],
+      "pricingUnsupported": false,
+      "tools": {},
+      "apiBase": "https://openrouter.ai/api/v1",
+      "source": "https://openrouter.ai/api/v1/models",
+      "checked": "2026-11-20",
+      "note": "OpenRouter routing prices may vary by endpoint. Credit-purchase fees are excluded. Batch-only routes already contain their own discounted prices."
     }
   ]
 }

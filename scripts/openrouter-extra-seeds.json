@@ -1,0 +1,68 @@
+[
+  {
+    "id": "deepseek/deepseek-v4.1-flash", "name": "DeepSeek: DeepSeek V4.1 Flash", "context_length": 1048576,
+    "pricing": {"prompt":"0.0000003","completion":"0.0000012","input_cache_read":"0.000000006"},
+    "top_provider": {"context_length":1048576,"max_completion_tokens":943718},
+    "reasoning": {"supported_efforts":["max","high","low","none"]}
+  },
+  {
+    "id": "deepseek/deepseek-v4-pro-0813", "name": "DeepSeek: DeepSeek V4 Pro 0813", "context_length": 1048576,
+    "pricing": {"prompt":"0.00000132","completion":"0.00000396","input_cache_read":"0.000000044"},
+    "top_provider": {"context_length":1048576,"max_completion_tokens":943718},
+    "reasoning": {"supported_efforts":["max","high","low","none"]}
+  },
+  {
+    "id": "z-ai/glm-5.3", "name": "Z.ai: GLM 5.3", "context_length": 1048576,
+    "pricing": {"prompt":"0.0000000699","completion":"0.0000014","input_cache_read":"0.0000000689"},
+    "top_provider": {"context_length":1048576,"max_completion_tokens":943718},
+    "reasoning": {"supported_efforts":["max","high","low"]}
+  },
+  {
+    "id": "z-ai/glm-5.3-flash", "name": "Z.ai: GLM 5.3 Flash", "context_length": 1048576,
+    "pricing": {"prompt":"0.0000000399","completion":"0.0000000784","input_cache_read":"0.00000003"},
+    "top_provider": {"context_length":1048576,"max_completion_tokens":131072},
+    "reasoning": {"supported_efforts":["max","high","low"]}
+  },
+  {
+    "id": "z-ai/glm-5.3-flashx", "name": "Z.ai: GLM 5.3 FlashX", "context_length": 1048576,
+    "pricing": {"prompt":"0.00000037","completion":"0.00000125","input_cache_read":"0.000000075"},
+    "top_provider": {"context_length":1048576,"max_completion_tokens":131072},
+    "reasoning": {"supported_efforts":["max","high","low"]}
+  },
+  {
+    "id": "z-ai/glm-5.3-prime", "name": "Z.ai: GLM 5.3 Prime", "context_length": 1000000,
+    "pricing": {"prompt":"0.00000168","completion":"0.00000528","input_cache_read":"0.000000336"},
+    "top_provider": {"context_length":1000000,"max_completion_tokens":131072},
+    "reasoning": {"supported_efforts":["max","high","low"]}
+  },
+  {
+    "id": "moonshotai/kimi-k3.1-pro", "name": "MoonshotAI: Kimi K3.1 Pro", "context_length": 1048576,
+    "pricing": {"prompt":"0.000000253","completion":"0.0000088","input_cache_read":"0.00000018"},
+    "top_provider": {"context_length":1048576,"max_completion_tokens":943718},
+    "reasoning": {"supported_efforts":["max","high","low","none"]}
+  },
+  {
+    "id": "moonshotai/kimi-k3", "name": "MoonshotAI: Kimi K3", "context_length": 1048576,
+    "pricing": {"prompt":"0.000000192","completion":"0.000016","input_cache_read":"0.000000182"},
+    "top_provider": {"context_length":1048576,"max_completion_tokens":943718},
+    "reasoning": {"supported_efforts":["max","high","low","none"]}
+  },
+  {
+    "id": "moonshotai/kimi-k3.1-pro:batch", "name": "MoonshotAI: Kimi K3.1 Pro (batch)", "context_length": 1048576,
+    "pricing": {"prompt":"0.000000372","completion":"0.000005583","input_cache_read":"0.0000001"},
+    "top_provider": {"context_length":1048576,"max_completion_tokens":943718},
+    "reasoning": {"supported_efforts":["max","high","low","none"]}
+  },
+  {
+    "id": "z-ai/glm-5.3:batch", "name": "Z.ai: GLM 5.3 (batch)", "context_length": 1048576,
+    "pricing": {"prompt":"0.00000028","completion":"0.000001249","input_cache_read":"0.000000061"},
+    "top_provider": {"context_length":1048575,"max_completion_tokens":943717},
+    "reasoning": {"supported_efforts":["max","high","low"]}
+  },
+  {
+    "id": "deepseek/deepseek-v4.1-flash:batch", "name": "DeepSeek: DeepSeek V4.1 Flash (batch)", "context_length": 1048576,
+    "pricing": {"prompt":"0.00000005","completion":"0.00000015","input_cache_read":"0.000000004"},
+    "top_provider": {"context_length":1048576,"max_completion_tokens":384000},
+    "reasoning": {"supported_efforts":["max","high","low","none"]}
+  }
+]
