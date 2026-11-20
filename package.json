@@ -1,0 +1,13 @@
+{
+  "name": "commercial-llm-cost-estimator",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A static, source-backed calculator for commercial LLM API and tool costs.",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "engines": { "node": ">=22" }
+}
